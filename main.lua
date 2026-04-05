@@ -141,29 +141,24 @@ function Menu.ApplyTheme(themeName)
     Menu.CurrentTheme = themeName
     
     if themeLower == "red" then
-        Menu.Colors.HeaderPink = { r = 255, g = 0, b = 0 }
-        Menu.Colors.SelectedBg = { r = 255, g = 0, b = 0 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
+        Menu.Colors.HeaderPink = { r = 180, g = 0, b = 0 }
+        Menu.Colors.SelectedBg = { r = 220, g = 20, b = 20 }
         Menu.CurrentTheme = "Red"
     elseif themeLower == "purple" then
-        Menu.Colors.HeaderPink = { r = 148, g = 0, b = 211 }
-        Menu.Colors.SelectedBg = { r = 148, g = 0, b = 211 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
+        Menu.Colors.HeaderPink = { r = 80, g = 0, b = 180 }
+        Menu.Colors.SelectedBg = { r = 140, g = 40, b = 220 }
         Menu.CurrentTheme = "Purple"
     elseif themeLower == "gray" then
-        Menu.Colors.HeaderPink = { r = 128, g = 128, b = 128 }
-        Menu.Colors.SelectedBg = { r = 128, g = 128, b = 128 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
+        Menu.Colors.HeaderPink = { r = 40, g = 40, b = 40 }
+        Menu.Colors.SelectedBg = { r = 80, g = 80, b = 80 }
         Menu.CurrentTheme = "Gray"
     elseif themeLower == "pink" then
-        Menu.Colors.HeaderPink = { r = 255, g = 20, b = 147 }
+        Menu.Colors.HeaderPink = { r = 200, g = 0, b = 100 }
         Menu.Colors.SelectedBg = { r = 255, g = 20, b = 147 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
         Menu.CurrentTheme = "pink"
     else
-        Menu.Colors.HeaderPink = { r = 148, g = 0, b = 211 }
-        Menu.Colors.SelectedBg = { r = 148, g = 0, b = 211 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
+        Menu.Colors.HeaderPink = { r = 80, g = 0, b = 180 }
+        Menu.Colors.SelectedBg = { r = 140, g = 40, b = 220 }
         Menu.CurrentTheme = "Purple"
     end
 
@@ -255,26 +250,31 @@ function Menu.DrawHeader()
     local y = scaledPos.y
     local width = scaledPos.width - 1
     local height = scaledPos.headerHeight
-    local radius = scaledPos.headerRadius
     local bannerHeight = Menu.Banner.height * scale
+    
+    local r = Menu.Colors.HeaderPink.r / 255.0
+    local g = Menu.Colors.HeaderPink.g / 255.0
+    local b = Menu.Colors.HeaderPink.b / 255.0
+
+    -- Premium Gradient Header Background
+    if Susano and Susano.DrawRectFilled then
+        -- Draw main dark base
+        Susano.DrawRectFilled(x, y, width, bannerHeight, 0.05, 0.05, 0.05, 1.0, 6 * scale)
+        -- Draw accent glow at bottom
+        Susano.DrawRectFilled(x, y + bannerHeight - 2, width, 2, r, g, b, 1.0, 0)
+    else
+        Menu.DrawRect(x, y, width, bannerHeight, 13, 13, 13, 255)
+        Menu.DrawRect(x, y + bannerHeight - 2, width, 2, Menu.Colors.HeaderPink.r, Menu.Colors.HeaderPink.g, Menu.Colors.HeaderPink.b, 255)
+    end
 
     if Menu.Banner.enabled then
         if Menu.bannerTexture and Menu.bannerTexture > 0 and Susano and Susano.DrawImage then
-            
             Susano.DrawImage(Menu.bannerTexture, x, y, width, bannerHeight, 1, 1, 1, 1, 0)
         else
-            Menu.DrawRect(x, y, width, height, Menu.Colors.HeaderPink.r, Menu.Colors.HeaderPink.g, Menu.Colors.HeaderPink.b, 255)
-
-            local logoX = x + width / 2 - 12
-            local logoY = y + height / 2 - 20
-            Menu.DrawText(logoX, logoY, "P", 44, 1.0, 1.0, 1.0, 1.0)
+            local logoX = x + width / 2 - 20
+            local logoY = y + bannerHeight / 2 - 25
+            Menu.DrawText(logoX, logoY, "B4L", 38, 1.0, 1.0, 1.0, 1.0)
         end
-    else
-        Menu.DrawRect(x, y, width, height, Menu.Colors.HeaderPink.r, Menu.Colors.HeaderPink.g, Menu.Colors.HeaderPink.b, 255)
-
-        local logoX = x + width / 2 - 12
-        local logoY = y + height / 2 - 20
-        Menu.DrawText(logoX, logoY, "P", 44, 1.0, 1.0, 1.0, 1.0)
     end
 end
 
@@ -553,7 +553,7 @@ function Menu.DrawItem(x, itemY, width, itemHeight, item, isSelected)
 
         local smoothSpeed = Menu.SmoothFactor
         Menu.SelectorY = Menu.SelectorY + (itemY - Menu.SelectorY) * smoothSpeed
-        if math.abs(Menu.SelectorY - itemY) < 0.5 then
+        if math.abs(Menu.SelectorY - itemY) < 0.2 then
             Menu.SelectorY = itemY
         end
         
@@ -562,93 +562,19 @@ function Menu.DrawItem(x, itemY, width, itemHeight, item, isSelected)
         local baseR = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.r) and (Menu.Colors.SelectedBg.r / 255.0) or 1.0
         local baseG = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.g) and (Menu.Colors.SelectedBg.g / 255.0) or 0.0
         local baseB = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.b) and (Menu.Colors.SelectedBg.b / 255.0) or 1.0
-        local darkenAmount = 0.4
-
+        
         local selectorX = x
         
-        if Menu.GradientType == 2 then
-            local gradientSteps = 120
-            local drawWidth = width - 1
-            local stepWidth = drawWidth / gradientSteps
-            local selectorY = drawY
-            local selectorHeight = itemHeight
-
-            for step = 0, gradientSteps - 1 do
-                local stepX = x + (step * stepWidth)
-                local actualStepWidth = stepWidth
-                
-                if actualStepWidth > 0 then
-                    local stepGradientFactor = step / (gradientSteps - 1)
-                   
-                    local easedFactor = stepGradientFactor < 0.5 
-                        and 4 * stepGradientFactor * stepGradientFactor * stepGradientFactor
-                        or 1 - math.pow(-2 * stepGradientFactor + 2, 3) / 2
-                    local darkenFactor = easedFactor * easedFactor
-                    local stepDarken = darkenFactor * 0.75
-
-                    local stepR = math.max(0, baseR - stepDarken)
-                    local stepG = math.max(0, baseG - stepDarken)
-                    local stepB = math.max(0, baseB - stepDarken)
-                    
-                 
-                    local brightness = 1.0
-                    if step < gradientSteps * 0.1 then
-                        brightness = 1.0 + (0.15 * (1.0 - step / (gradientSteps * 0.1)))
-                    end
-                    stepR = math.min(1.0, stepR * brightness)
-                    stepG = math.min(1.0, stepG * brightness)
-                    stepB = math.min(1.0, stepB * brightness)
-                    
-                    local alpha = 0.95
-                    if step > gradientSteps - 20 then
-                        alpha = 0.95 * (1.0 - ((step - (gradientSteps - 20)) / 20))
-                    end
-
-                    if Susano and Susano.DrawRectFilled then
-                        Susano.DrawRectFilled(stepX, selectorY, actualStepWidth, selectorHeight, stepR, stepG, stepB, alpha, 0.0)
-                    else
-                        Menu.DrawRect(stepX, selectorY, actualStepWidth, selectorHeight, stepR * 255, stepG * 255, stepB * 255, math.floor(alpha * 255))
-                    end
-                end
-            end
+        -- Premium Aesthetic Selector with subtle glass effect
+        if Susano and Susano.DrawRectFilled then
+            -- Base Highlight
+            Susano.DrawRectFilled(selectorX, drawY, width, itemHeight, baseR, baseG, baseB, 0.15, 4 * scale)
+            -- Left Border Accent
+            Susano.DrawRectFilled(selectorX, drawY, 3 * scale, itemHeight, baseR, baseG, baseB, 1.0, 0)
         else
-            local gradientSteps = 50
-            local stepHeight = itemHeight / gradientSteps
-            local selectorWidth = width - 1
-    
-            for step = 0, gradientSteps - 1 do
-                local stepY = drawY + (step * stepHeight)
-                local actualStepHeight = math.min(stepHeight, (drawY + itemHeight) - stepY)
-                if actualStepHeight > 0 then
-                    local stepGradientFactor = step / (gradientSteps - 1)
-                    
-                    local easedFactor = stepGradientFactor * stepGradientFactor * (3.0 - 2.0 * stepGradientFactor)
-                    
-                    local stepDarken = easedFactor * darkenAmount * 1.0
-
-                    local stepR = math.max(0, baseR - stepDarken)
-                    local stepG = math.max(0, baseG - stepDarken)
-                    local stepB = math.max(0, baseB - stepDarken)
-                    
-                   
-                    local brightness = 1.0
-                    if step < gradientSteps * 0.15 then
-                        brightness = 1.0 + (0.12 * (1.0 - step / (gradientSteps * 0.15)))
-                    end
-                    stepR = math.min(1.0, stepR * brightness)
-                    stepG = math.min(1.0, stepG * brightness)
-                    stepB = math.min(1.0, stepB * brightness)
-
-                    if Susano and Susano.DrawRectFilled then
-                        Susano.DrawRectFilled(selectorX, stepY, selectorWidth, actualStepHeight, stepR, stepG, stepB, 0.95, 0.0)
-                    else
-                        Menu.DrawRect(selectorX, stepY, selectorWidth, actualStepHeight, stepR * 255, stepG * 255, stepB * 255, 242)
-                    end
-                end
-            end
+            Menu.DrawRect(selectorX, drawY, width, itemHeight, baseR * 255, baseG * 255, baseB * 255, 40)
+            Menu.DrawRect(selectorX, drawY, 3, itemHeight, baseR * 255, baseG * 255, baseB * 255, 255)
         end
-
-        Menu.DrawRect(selectorX, drawY, 3, itemHeight, Menu.Colors.SelectedBg.r, Menu.Colors.SelectedBg.g, Menu.Colors.SelectedBg.b, 255)
     end
 
     local textX = x + (16 * scale)
@@ -2001,42 +1927,6 @@ function Menu.DrawBackground()
         end
     end
 
-    if Menu.ShowSnowflakes then
-        for _, p in ipairs(Menu.Particles) do
-            p.y = p.y + p.speedY
-            p.x = p.x + p.speedX
-
-            if p.y > 1.0 then
-                p.y = 0
-                p.x = math.random(0, 100) / 100
-                p.speedY = math.random(20, 100) / 10000
-                p.speedX = math.random(-20, 20) / 10000
-            end
-
-            local pX = x + (p.x * width)
-            local pY = y + (p.y * fullHeight)
-            
-            local isVisible = false
-            for i, seg in ipairs(segments) do
-                if i == #segments then
-                    break
-                end
-                if pY >= seg.y and pY <= seg.y + seg.h then
-                    isVisible = true
-                    break
-                end
-            end
-            
-            if isVisible then
-                 local alpha = math.random(100, 200)
-                 if Susano and Susano.DrawRectFilled then
-                    Susano.DrawRectFilled(pX, pY, p.size, p.size, 1.0, 1.0, 1.0, alpha/255, 0)
-                else
-                    Menu.DrawRect(pX, pY, p.size, p.size, 255, 255, 255, alpha)
-                end
-            end
-        end
-    end
 end
 
 
