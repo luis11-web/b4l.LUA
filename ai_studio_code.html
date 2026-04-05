@@ -2,157 +2,316 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cold Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Trace Menu</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: transparent; color: #d1d5db; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; }
-        .cold-window { background: #0a0a0a; border: 1px solid rgba(37, 99, 235, 0.3); box-shadow: 0 0 50px rgba(0,0,0,0.9); }
-        .sidebar { background: #111111; border-right: 1px solid rgba(255,255,255,0.05); }
-        .active-tab { background: rgba(37, 99, 235, 0.1); color: #60a5fa; border-left: 2px solid #2563eb; }
-        .card { background: #111111; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; }
-        .switch { width: 32px; height: 16px; background: #374151; border-radius: 999px; position: relative; cursor: pointer; transition: 0.3s; }
-        .switch-active { background: #2563eb; }
-        .switch-circle { width: 10px; height: 10px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: 0.3s; }
-        .switch-active .switch-circle { left: 19px; }
-        .slider { -webkit-appearance: none; width: 100%; height: 4px; background: #374151; border-radius: 5px; outline: none; }
-        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #2563eb; border-radius: 50%; cursor: pointer; border: 2px solid white; }
-        .subtab-active { color: #60a5fa; border-bottom: 2px solid #2563eb; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #2563eb; border-radius: 10px; }
-        .close-btn:hover { color: #ef4444; transform: scale(1.1); }
+        body {
+            user-select: none;
+            -webkit-user-drag: none;
+            cursor: default;
+            background: transparent;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .animate-spin-slow {
+            animation: spin-slow 1.5s linear infinite;
+        }
+
+        /* Transitions */
+        .menu-hidden {
+            display: none;
+            pointer-events: none;
+        }
+
+        .menu-visible {
+            display: block !important;
+            opacity: 1 !important;
+            transform: translate(-50%, -50%) scale(1) !important;
+            pointer-events: auto !important;
+            z-index: 100;
+        }
+
+        .loader-fade-out {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* Feature Item Styling */
+        .feature-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: #0d0d0d;
+            border: 1px solid transparent;
+            color: #888;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .feature-item:hover {
+            background: #141414;
+            color: #fff;
+            border-color: #333;
+        }
+
+        .feature-item.active {
+            background: #1a0a24;
+            border-color: #a020f0 !important;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(160, 32, 240, 0.15);
+        }
+
+        .feature-item.active .keybind-box {
+            border-color: #a020f0;
+            color: #a020f0;
+            box-shadow: 0 0 8px rgba(160, 32, 240, 0.3);
+        }
+
+        /* Keybind Box */
+        .keybind-box {
+            width: auto;
+            min-width: 45px;
+            height: 18px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: #555;
+            transition: all 0.2s ease;
+        }
+
+        .keybind-box:hover {
+            border-color: #a020f0;
+            color: #fff;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a020f0;
+        }
+
+        /* Glow Pulser */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 20px rgba(160, 32, 240, 0.1); }
+            50% { box-shadow: 0 0 30px rgba(160, 32, 240, 0.2); }
+            100% { box-shadow: 0 0 20px rgba(160, 32, 240, 0.1); }
+        }
+
+        #main-menu {
+            border: 1px solid #333;
+            border-radius: 2px;
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
     </style>
 </head>
-<body class="flex items-center justify-center h-screen">
-    <div id="app" class="cold-window w-[950px] h-[600px] rounded-xl flex overflow-hidden hidden relative">
-        
-        <!-- Close Button (Top Right) -->
-        <button onclick="closeMenu()" class="absolute top-4 right-6 text-gray-500 close-btn transition-all z-50">
-            <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-
-        <!-- Sidebar -->
-        <div class="sidebar w-52 flex flex-col">
-            <div class="p-6 flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.5)]">
-                    <span class="text-white font-black text-sm italic">C</span>
-                </div>
-                <span class="text-white font-black tracking-tighter text-xl italic">COLD</span>
-            </div>
-            <nav class="flex-1 px-3 space-y-1 mt-4">
-                <div class="px-4 py-2 text-[10px] font-black text-gray-600 uppercase tracking-widest">Geral</div>
-                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[11px] font-bold uppercase tracking-wider active-tab">
-                    <i data-lucide="user" class="w-4 h-4"></i> Jogador
-                </button>
-                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[11px] font-bold uppercase tracking-wider text-gray-500 hover:bg-white/5 transition">
-                    <i data-lucide="car" class="w-4 h-4"></i> Veículos
-                </button>
-                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[11px] font-bold uppercase tracking-wider text-gray-500 hover:bg-white/5 transition">
-                    <i data-lucide="crosshair" class="w-4 h-4"></i> Armas
-                </button>
-                <div class="px-4 py-2 mt-4 text-[10px] font-black text-gray-600 uppercase tracking-widest">Servidor</div>
-                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[11px] font-bold uppercase tracking-wider text-gray-500 hover:bg-white/5 transition">
-                    <i data-lucide="globe" class="w-4 h-4"></i> Online
-                </button>
-            </nav>
-        </div>
-
-        <!-- Main Body -->
-        <div class="flex-1 flex flex-col">
-            <!-- Top Bar -->
-            <div class="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#111111]/50">
-                <div class="flex gap-6 h-full">
-                    <button class="text-[11px] font-bold uppercase tracking-widest h-full subtab-active">Subtab 1</button>
-                    <button class="text-[11px] font-bold uppercase tracking-widest h-full text-gray-500 hover:text-gray-300">Subtab 2</button>
-                    <button class="text-[11px] font-bold uppercase tracking-widest h-full text-gray-500 hover:text-gray-300">Subtab 3</button>
-                </div>
-                <div class="bg-white/5 rounded-lg px-4 py-2 flex items-center gap-3 border border-white/10 mr-12">
-                    <i data-lucide="search" class="w-4 h-4 text-gray-500"></i>
-                    <input type="text" placeholder="PESQUISAR..." class="bg-transparent border-none outline-none text-[10px] font-bold text-gray-300 placeholder-gray-600 w-32">
-                </div>
-            </div>
-
-            <!-- Content Grid -->
-            <div class="flex-1 p-8 grid grid-cols-2 gap-6 overflow-y-auto">
-                <!-- Card 1 -->
-                <div class="card p-6 space-y-4">
-                    <div class="flex items-center gap-3 text-[11px] font-black text-blue-500 uppercase tracking-[0.2em] mb-2">
-                        <i data-lucide="settings" class="w-4 h-4"></i> Opções Gerais
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Godmode</span>
-                            <div class="switch" onclick="toggleSwitch(this, 'godmode')"><div class="switch-circle"></div></div>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Invisível</span>
-                            <div class="switch" onclick="toggleSwitch(this, 'invisible')"><div class="switch-circle"></div></div>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-[10px] font-bold text-gray-500 uppercase">
-                                <span>Velocidade</span>
-                                <span id="speed-val">50</span>
-                            </div>
-                            <input type="range" class="slider" oninput="updateSlider(this, 'speed')">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="card p-6 space-y-4">
-                    <div class="flex items-center gap-3 text-[11px] font-black text-blue-500 uppercase tracking-[0.2em] mb-2">
-                        <i data-lucide="zap" class="w-4 h-4"></i> Movimentação
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Noclip</span>
-                            <div class="switch" onclick="toggleSwitch(this, 'noclip')"><div class="switch-circle"></div></div>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="text-[10px] font-bold text-gray-500 uppercase">Exemplo Combo:</div>
-                            <select class="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-[11px] text-gray-300 outline-none" onchange="triggerCombo('menu_type', this.value)">
-                                <option>Opção 1</option>
-                                <option>Opção 2</option>
-                                <option>Opção 3</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+<body class="bg-transparent overflow-hidden">
+    <!-- Loader -->
+    <div id="loader-container" class="fixed inset-0 flex items-center justify-center bg-[#0f0f0f]/[0.98] transition-opacity duration-1000 z-50">
+        <div class="text-center">
+            <div class="loader-circle border-4 border-t-[#a020f0] border-[#333] rounded-full w-12 h-12 animate-spin-slow mx-auto mb-4"></div>
+            <p class="text-white text-sm font-light tracking-widest uppercase">Carregando Assets</p>
+            <div class="w-48 h-1 bg-[#333] mt-4 rounded-full overflow-hidden">
+                <div id="progress-bar" class="w-0 h-full bg-[#a020f0] transition-all duration-3000 ease-in-out"></div>
             </div>
         </div>
     </div>
 
+    <!-- Main Menu -->
+    <div id="main-menu" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] bg-[#0f0f0f]/[0.98] border border-[#333] menu-hidden opacity-0 scale-95 transition-all duration-500">
+        <div class="p-4 border-b border-[#333] flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-[#a020f0] text-black font-bold px-2 py-0.5 rounded text-xs shadow-[0_0_10px_rgba(160,32,240,0.5)]">ZT</div>
+                <h1 class="text-white font-['Montserrat'] font-bold text-sm tracking-tight">ZERO TRACE MENU</h1>
+            </div>
+            <span class="text-[#666] text-[10px] font-bold">V1.0.0</span>
+        </div>
+
+        <div class="p-4 bg-[#141414] mx-4 my-3 border border-[#333] flex items-center gap-4">
+            <div class="relative">
+                <div class="w-10 h-10 rounded-full border border-[#a020f0] flex items-center justify-center bg-[#0a0a0a] overflow-hidden">
+                    <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" alt="Avatar" class="w-full h-full object-cover grayscale opacity-80">
+                </div>
+                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#141414]"></div>
+            </div>
+            <div>
+                <p class="text-xs text-[#888] font-semibold uppercase tracking-wider">User Profile</p>
+                <p class="text-white font-bold text-sm">Luis_Xitada</p>
+            </div>
+        </div>
+
+        <div class="px-4 py-2 space-y-1 max-h-[400px] overflow-y-auto custom-scrollbar">
+            <div class="feature-item active" data-feature="godmode">
+                <span>God Mode</span>
+                <div class="keybind-box" onclick="startKeybind(event, 'godmode')">None</div>
+            </div>
+            <div class="feature-item" data-feature="invisible">
+                <span>Invisibility</span>
+                <div class="keybind-box" onclick="startKeybind(event, 'invisible')">None</div>
+            </div>
+            <div class="feature-item" data-feature="infiniteammo">
+                <span>Infinite Ammo</span>
+                <div class="keybind-box" onclick="startKeybind(event, 'infiniteammo')">None</div>
+            </div>
+            <div class="feature-item" data-feature="noclip">
+                <span>No Clip</span>
+                <div class="keybind-box" onclick="startKeybind(event, 'noclip')">None</div>
+            </div>
+            <div class="feature-item" data-feature="esp">
+                <span>ESP Box</span>
+                <div class="keybind-box" onclick="startKeybind(event, 'esp')">None</div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-[#333] flex items-center justify-between text-[11px] font-bold">
+            <div class="flex items-center gap-2 text-[#888] hover:text-white cursor-pointer transition-colors">
+                <i class="fab fa-discord"></i>
+                <span>discord.gg/zt</span>
+            </div>
+            <div class="text-[#888]">
+                <span class="text-[#a020f0]">1</span> / 8
+            </div>
+        </div>
+
+        <div id="key-listener-overlay" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center text-white text-xs uppercase tracking-widest font-bold">
+            Awaiting Next Keypress...
+        </div>
+    </div>
+
     <script>
-        lucide.createIcons();
+        let currentFeature = null;
+        let isListeningForKey = false;
+        let selectedIndex = 0;
+        const features = document.querySelectorAll('.feature-item');
 
-        function closeMenu() {
-            fetch(`https://${GetParentResourceName()}/close_menu`, {
-                method: 'POST',
-                body: JSON.stringify({})
+        window.addEventListener('load', () => {
+            const progressBar = document.getElementById('progress-bar');
+            if (progressBar) {
+                progressBar.style.width = '100%';
+            }
+
+            setTimeout(() => {
+                const loader = document.getElementById('loader-container');
+                const menu = document.getElementById('main-menu');
+                
+                loader.classList.add('loader-fade-out');
+                
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    menu.classList.remove('menu-hidden');
+                    menu.classList.add('menu-visible');
+                    updateSelection();
+                }, 1000);
+            }, 3000);
+        });
+
+        function updateSelection() {
+            features.forEach((item, index) => {
+                item.classList.remove('active');
+                if (index === selectedIndex) {
+                    item.classList.add('active');
+                    const counterLabel = document.querySelector('.text-[#888] .text-[#a020f0]');
+                    if (counterLabel) {
+                        counterLabel.innerText = selectedIndex + 1;
+                    }
+                }
             });
         }
 
-        function toggleSwitch(el, name) {
-            el.classList.toggle('switch-active');
-            const isActive = el.classList.contains('switch-active');
-            fetch(`https://${GetParentResourceName()}/toggle_feature`, {
+        window.addEventListener('keydown', (e) => {
+            if (isListeningForKey) {
+                handleKeyCapture(e);
+                return;
+            }
+
+            if (e.key === 'ArrowDown') {
+                selectedIndex = (selectedIndex + 1) % features.length;
+                updateSelection();
+            } else if (e.key === 'ArrowUp') {
+                selectedIndex = (selectedIndex - 1 + features.length) % features.length;
+                updateSelection();
+            } else if (e.key === 'Enter') {
+                toggleFeature(features[selectedIndex].dataset.feature);
+            }
+        });
+
+        function toggleFeature(featureName) {
+            fetch(`https://zt_menu/toggleFeature`, {
                 method: 'POST',
-                body: JSON.stringify({ name: name, state: isActive })
+                body: JSON.stringify({ name: featureName })
             });
         }
 
-        function updateSlider(el, name) {
-            document.getElementById(`${name}-val`).innerText = el.value;
-            fetch(`https://${GetParentResourceName()}/slider_change`, {
+        function startKeybind(event, featureName) {
+            if (event) event.stopPropagation();
+            currentFeature = featureName;
+            isListeningForKey = true;
+            
+            const overlay = document.getElementById('key-listener-overlay');
+            overlay.classList.remove('hidden');
+        }
+
+        function handleKeyCapture(e) {
+            e.preventDefault();
+            const key = e.key.toUpperCase();
+            
+            const featureElement = document.querySelector(`[data-feature="${currentFeature}"] .keybind-box`);
+            if (featureElement) {
+                featureElement.innerText = key;
+            }
+
+            fetch(`https://zt_menu/setKeybind`, {
                 method: 'POST',
-                body: JSON.stringify({ name: name, value: el.value })
+                body: JSON.stringify({ 
+                    feature: currentFeature, 
+                    key: key 
+                })
             });
+
+            isListeningForKey = false;
+            document.getElementById('key-listener-overlay').classList.add('hidden');
         }
 
         window.addEventListener('message', (event) => {
-            if (event.data.type === 'toggle_ui') {
-                document.getElementById('app').style.display = event.data.visible ? 'flex' : 'none';
+            const data = event.data;
+            if (data.type === 'setVisible') {
+                const menu = document.getElementById('main-menu');
+                if (data.show) {
+                    menu.classList.remove('menu-hidden');
+                    menu.classList.add('menu-visible');
+                } else {
+                    menu.classList.remove('menu-visible');
+                    menu.classList.add('menu-hidden');
+                }
             }
         });
     </script>
