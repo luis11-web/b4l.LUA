@@ -11,8 +11,10 @@ Menu.CurrentTab = 1
 Menu.ItemScrollOffset = 0
 Menu.CategoryScrollOffset = 0
 Menu.EditorDragging = false
+Menu.EditorDragOffsetX = 0
+Menu.EditorDragOffsetY = 0
 Menu.EditorMode = false
-Menu.ShowSnowflakes = true
+Menu.ShowSnowflakes = false
 Menu.SelectorY = 0
 Menu.CategorySelectorY = 0
 Menu.TabSelectorX = 0
@@ -40,55 +42,7 @@ Menu.BindingItem = nil
 Menu.BindingKey = nil
 Menu.BindingKeyName = nil
 
--- GIF / Animation Support
-Menu.BannerFrames = {}
-Menu.CurrentFrame = 1
-Menu.LastFrameTime = 0
-Menu.FrameDelay = 100 -- ms
-Menu.IsAnimatedBanner = false
-
--- Particle System (Snowflakes/Neon)
-Menu.Particles = {}
-Menu.MaxParticles = 60
-Menu.ShowSnowflakes = true
-
-function Menu.UpdateParticles()
-    if not Menu.ShowSnowflakes then return end
-    
-    local screenWidth = 1920
-    local screenHeight = 1080
-    if Susano and Susano.GetScreenWidth and Susano.GetScreenHeight then
-        screenWidth = Susano.GetScreenWidth()
-        screenHeight = Susano.GetScreenHeight()
-    end
-
-    if #Menu.Particles < Menu.MaxParticles then
-        table.insert(Menu.Particles, {
-            x = math.random(0, screenWidth),
-            y = math.random(-200, 0),
-            speed = math.random(1, 3) + math.random(),
-            size = math.random(4, 10) / 10 * (Menu.Scale or 1.0),
-            opacity = math.random(5, 15) / 100,
-            drift = math.random(-10, 10) / 20
-        })
-    end
-
-    for i = #Menu.Particles, 1, -1 do
-        local p = Menu.Particles[i]
-        p.y = p.y + p.speed
-        p.x = p.x + p.drift
-        if p.y > screenHeight then
-            table.remove(Menu.Particles, i)
-        end
-    end
-end
-
-function Menu.DrawParticles()
-    if not Menu.ShowSnowflakes then return end
-    for _, p in ipairs(Menu.Particles) do
-        Menu.DrawRect(p.x, p.y, p.size, p.size, 1.0, 1.0, 1.0, p.opacity)
-    end
-end
+Menu.ShowKeybinds = false
 
 
 Menu.CurrentTopTab = 1
@@ -117,7 +71,7 @@ end
 
 Menu.Banner = {
     enabled = true,
-    imageUrl = "https://i.imgur.com/pxHCIGe",
+    imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&=",
     height = 100
 }
 
@@ -129,28 +83,26 @@ function Menu.LoadBannerTexture(url)
     if not url or url == "" then return end
     if not Susano or not Susano.HttpGet or not Susano.LoadTextureFromBuffer then return end
 
-    if type(url) == "table" then
-        Menu.IsAnimatedBanner = true
-        Menu.BannerFrames = {}
-        for i, u in ipairs(url) do
-            CreateThread(function()
-                local status, body = Susano.HttpGet(u)
+    if CreateThread then
+        CreateThread(function()
+            local success, result = pcall(function()
+                local status, body = Susano.HttpGet(url)
                 if status == 200 and body and #body > 0 then
                     local textureId, width, height = Susano.LoadTextureFromBuffer(body)
                     if textureId and textureId ~= 0 then
-                        Menu.BannerFrames[i] = textureId
+                        Menu.bannerTexture = textureId
                         Menu.bannerWidth = width
                         Menu.bannerHeight = height
+                        return textureId
                     end
                 end
+                return nil
             end)
-        end
-        return
-    end
-
-    Menu.IsAnimatedBanner = false
-    if CreateThread then
-        CreateThread(function()
+            if not success then
+            end
+        end)
+    else
+        local success, result = pcall(function()
             local status, body = Susano.HttpGet(url)
             if status == 200 and body and #body > 0 then
                 local textureId, width, height = Susano.LoadTextureFromBuffer(body)
@@ -158,21 +110,14 @@ function Menu.LoadBannerTexture(url)
                     Menu.bannerTexture = textureId
                     Menu.bannerWidth = width
                     Menu.bannerHeight = height
+                    print("Banner texture loaded successfully")
+                    return textureId
                 end
             end
+            return nil
         end)
-    end
-end
-
-function Menu.UpdateAnimation()
-    if not Menu.IsAnimatedBanner or #Menu.BannerFrames < 2 then return end
-    local currentTime = GetGameTimer()
-    if currentTime - Menu.LastFrameTime > Menu.FrameDelay then
-        Menu.CurrentFrame = Menu.CurrentFrame + 1
-        if Menu.CurrentFrame > #Menu.BannerFrames then
-            Menu.CurrentFrame = 1
+        if not success then
         end
-        Menu.LastFrameTime = currentTime
     end
 end
 
@@ -198,27 +143,27 @@ function Menu.ApplyTheme(themeName)
     if themeLower == "red" then
         Menu.Colors.HeaderPink = { r = 255, g = 0, b = 0 }
         Menu.Colors.SelectedBg = { r = 255, g = 0, b = 0 }
-        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
+        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
         Menu.CurrentTheme = "Red"
     elseif themeLower == "purple" then
         Menu.Colors.HeaderPink = { r = 148, g = 0, b = 211 }
         Menu.Colors.SelectedBg = { r = 148, g = 0, b = 211 }
-        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
+        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
         Menu.CurrentTheme = "Purple"
     elseif themeLower == "gray" then
         Menu.Colors.HeaderPink = { r = 128, g = 128, b = 128 }
         Menu.Colors.SelectedBg = { r = 128, g = 128, b = 128 }
-        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
+        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
         Menu.CurrentTheme = "Gray"
     elseif themeLower == "pink" then
         Menu.Colors.HeaderPink = { r = 255, g = 20, b = 147 }
         Menu.Colors.SelectedBg = { r = 255, g = 20, b = 147 }
-        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
+        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
         Menu.CurrentTheme = "pink"
     else
         Menu.Colors.HeaderPink = { r = 148, g = 0, b = 211 }
         Menu.Colors.SelectedBg = { r = 148, g = 0, b = 211 }
-        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
+        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
         Menu.CurrentTheme = "Purple"
     end
 
@@ -303,16 +248,6 @@ function Menu.DrawText(x, y, text, size_px, r, g, b, a)
     Susano.DrawText(x, y, text, size_px, r, g, b, a)
 end
 
-function Menu.DrawGlow(x, y, width, height, r, g, b, a, layers)
-    layers = layers or 8
-    local stepSize = 1.0 * (Menu.Scale or 1.0)
-    local stepAlpha = a / layers
-    for i = 1, layers do
-        local growth = i * stepSize
-        Menu.DrawRect(x - growth, y - growth, width + growth * 2, height + growth * 2, r, g, b, stepAlpha)
-    end
-end
-
 function Menu.DrawHeader()
     local scaledPos = Menu.GetScaledPosition()
     local scale = Menu.Scale or 1.0
@@ -320,40 +255,27 @@ function Menu.DrawHeader()
     local y = scaledPos.y
     local width = scaledPos.width - 1
     local height = scaledPos.headerHeight
+    local radius = scaledPos.headerRadius
     local bannerHeight = Menu.Banner.height * scale
-    
-    local r = Menu.Colors.HeaderPink.r / 255.0
-    local g = Menu.Colors.HeaderPink.g / 255.0
-    local b = Menu.Colors.HeaderPink.b / 255.0
 
-    -- Premium Glow Background
-    Menu.DrawGlow(x, y, width, height, r, g, b, 0.1, 10)
-    
     if Menu.Banner.enabled then
-        local currentTex = Menu.bannerTexture
-        if Menu.IsAnimatedBanner and Menu.BannerFrames[Menu.CurrentFrame] then
-            currentTex = Menu.BannerFrames[Menu.CurrentFrame]
-        end
-
-        if currentTex and currentTex > 0 and Susano and Susano.DrawImage then
-            Susano.DrawImage(currentTex, x, y, width, bannerHeight, 1, 1, 1, 1, 0)
+        if Menu.bannerTexture and Menu.bannerTexture > 0 and Susano and Susano.DrawImage then
+            
+            Susano.DrawImage(Menu.bannerTexture, x, y, width, bannerHeight, 1, 1, 1, 1, 0)
         else
             Menu.DrawRect(x, y, width, height, Menu.Colors.HeaderPink.r, Menu.Colors.HeaderPink.g, Menu.Colors.HeaderPink.b, 255)
+
             local logoX = x + width / 2 - 12
             local logoY = y + height / 2 - 20
             Menu.DrawText(logoX, logoY, "P", 44, 1.0, 1.0, 1.0, 1.0)
         end
     else
         Menu.DrawRect(x, y, width, height, Menu.Colors.HeaderPink.r, Menu.Colors.HeaderPink.g, Menu.Colors.HeaderPink.b, 255)
+
         local logoX = x + width / 2 - 12
         local logoY = y + height / 2 - 20
         Menu.DrawText(logoX, logoY, "P", 44, 1.0, 1.0, 1.0, 1.0)
     end
-
-    -- Premium Neon Lines
-    local neonHeight = 2 * scale
-    Menu.DrawRect(x, y + bannerHeight - neonHeight, width, neonHeight, r * 1.5, g * 1.5, b * 1.5, 1.0)
-    Menu.DrawGlow(x, y + bannerHeight - neonHeight, width, neonHeight, r, g, b, 0.4, 5)
 end
 
 function Menu.DrawScrollbar(x, startY, visibleHeight, selectedIndex, totalItems, isMainMenu, menuWidth)
@@ -2119,9 +2041,6 @@ end
 
 
 function Menu.Render()
-    if Menu.UpdateParticles then Menu.UpdateParticles() end
-    if Menu.UpdateAnimation then Menu.UpdateAnimation() end
-
     if Menu.TopLevelTabs and not Menu.Categories then
         Menu.UpdateCategoriesFromTopTab()
     end
@@ -2167,7 +2086,6 @@ function Menu.Render()
             Susano.EnableOverlay(false)
         end
         
-        if Menu.DrawParticles then Menu.DrawParticles() end
         Menu.DrawBackground()
         Menu.DrawHeader()
         Menu.DrawCategories()
