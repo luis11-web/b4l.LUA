@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Architect Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        body { background: transparent; color: #d1d5db; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .architect-window { background: #1a1a1a; border: 1px solid #007bff; box-shadow: 0 0 40px rgba(0,0,0,0.9); }
+        .sidebar { background: #111111; }
+        .active-tab { border-left: 2px solid #007bff; color: white; background: rgba(0,123,255,0.05); }
+        .toggle-box { width: 16px; height: 16px; border: 1px solid #374151; transition: all 0.2s; }
+        .toggle-active { background: #007bff; border-color: #007bff; box-shadow: 0 0 10px rgba(0,123,255,0.4); }
+        .bind-box { background: #111111; border: 1px solid #374151; font-size: 9px; min-width: 45px; text-align: center; }
+        .binding-active { border-color: #007bff; color: #007bff; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen">
+    <div id="app" class="architect-window w-[850px] h-[550px] rounded-sm flex overflow-hidden hidden">
+        <!-- Sidebar -->
+        <div class="sidebar w-[220px] flex flex-col">
+            <div class="p-6 mb-4">
+                <h1 class="text-[10px] font-black tracking-[0.4em] text-white opacity-90">ARCHITECT</h1>
+                <div class="h-[1px] w-full bg-blue-600/30 mt-2"></div>
+            </div>
+            <nav class="flex-1">
+                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold active-tab uppercase tracking-wider">Player</button>
+                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold text-gray-500 hover:text-gray-300 uppercase tracking-wider transition">Weapon</button>
+                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold text-gray-500 hover:text-gray-300 uppercase tracking-wider transition">Vehicle</button>
+                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold text-gray-500 hover:text-gray-300 uppercase tracking-wider transition">Visuals</button>
+                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold text-gray-500 hover:text-gray-300 uppercase tracking-wider transition">Config</button>
+            </nav>
+        </div>
+
+        <!-- Main Body -->
+        <div class="flex-1 p-8 overflow-y-auto">
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Feature Item -->
+                <div class="bg-[#111111]/40 border border-white/5 p-4 rounded-sm flex justify-between items-center group hover:bg-white/5 transition">
+                    <div class="flex items-center gap-3">
+                        <div id="godmode-toggle" class="toggle-box rounded-sm" onclick="toggleFeature('godmode')"></div>
+                        <span class="text-[11px] font-bold text-gray-200 uppercase tracking-wide">Godmode</span>
+                    </div>
+                    <div id="godmode-bind" class="bind-box py-1 px-2 rounded-sm cursor-pointer text-gray-500" onclick="startBinding('godmode')">[NONE]</div>
+                </div>
+                
+                <!-- More items... -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let features = { godmode: { active: false, bind: 'NONE' } };
+
+        function toggleFeature(name) {
+            features[name].active = !features[name].active;
+            document.getElementById(`${name}-toggle`).className = `toggle-box rounded-sm ${features[name].active ? 'toggle-active' : ''}`;
+            fetch(`https://${GetParentResourceName()}/toggle_feature`, {
+                method: 'POST',
+                body: JSON.stringify({ name: name, state: features[name].active })
+            });
+        }
+
+        function startBinding(name) {
+            const el = document.getElementById(`${name}-bind`);
+            el.innerText = 'BINDING...';
+            el.classList.add('binding-active');
+            fetch(`https://${GetParentResourceName()}/start_binding`, {
+                method: 'POST',
+                body: JSON.stringify({ feature: name })
+            });
+        }
+
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            if (data.type === 'toggle_ui') {
+                document.getElementById('app').style.display = data.visible ? 'flex' : 'none';
+            } else if (data.type === 'key_captured') {
+                const el = document.getElementById(`${data.feature}-bind`);
+                el.innerText = `[KEY ${data.key}]`;
+                el.classList.remove('binding-active');
+            }
+        });
+    </script>
+</body>
+</html>
