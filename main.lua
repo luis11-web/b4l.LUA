@@ -11,16 +11,40 @@ Menu.CurrentTab = 1
 Menu.ItemScrollOffset = 0
 Menu.CategoryScrollOffset = 0
 Menu.EditorDragging = false
-Menu.EditorDragOffsetX = 0
-Menu.EditorDragOffsetY = 0
 Menu.EditorMode = false
-Menu.ShowKeybinds = false
+Menu.ShowSnowflakes = true
+Menu.SelectorY = 0
+Menu.CategorySelectorY = 0
+Menu.TabSelectorX = 0
+Menu.TabSelectorWidth = 0
+Menu.SmoothFactor = 0.2
+Menu.GradientType = 1
+Menu.ScrollbarPosition = 1
+
+Menu.LoadingBarAlpha = 0.0
+Menu.KeySelectorAlpha = 0.0
+Menu.KeybindsInterfaceAlpha = 0.0
+
+Menu.LoadingProgress = 0.0
+Menu.IsLoading = true
+Menu.LoadingComplete = false
+Menu.LoadingStartTime = nil
+Menu.LoadingDuration = 3000
+
+Menu.SelectingKey = false
+Menu.SelectedKey = nil
+Menu.SelectedKeyName = nil
+
+Menu.SelectingBind = false
+Menu.BindingItem = nil
+Menu.BindingKey = nil
+Menu.BindingKeyName = nil
 
 -- GIF / Animation Support
 Menu.BannerFrames = {}
 Menu.CurrentFrame = 1
 Menu.LastFrameTime = 0
-Menu.FrameDelay = 50 -- ms
+Menu.FrameDelay = 100 -- ms
 Menu.IsAnimatedBanner = false
 
 -- Particle System (Snowflakes/Neon)
@@ -2095,6 +2119,9 @@ end
 
 
 function Menu.Render()
+    if Menu.UpdateParticles then Menu.UpdateParticles() end
+    if Menu.UpdateAnimation then Menu.UpdateAnimation() end
+
     if Menu.TopLevelTabs and not Menu.Categories then
         Menu.UpdateCategoriesFromTopTab()
     end
@@ -2140,6 +2167,7 @@ function Menu.Render()
             Susano.EnableOverlay(false)
         end
         
+        if Menu.DrawParticles then Menu.DrawParticles() end
         Menu.DrawBackground()
         Menu.DrawHeader()
         Menu.DrawCategories()
