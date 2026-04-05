@@ -2,318 +2,209 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zero Trace Menu</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
         body {
-            user-select: none;
-            -webkit-user-drag: none;
-            cursor: default;
-            background: transparent;
+            background: transparent !important;
             overflow: hidden;
-            font-family: 'Inter', sans-serif;
-        }
-
-        @keyframes spin-slow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .animate-spin-slow {
-            animation: spin-slow 1.5s linear infinite;
-        }
-
-        /* Transitions */
-        .menu-hidden {
-            display: none;
-            pointer-events: none;
-        }
-
-        .menu-visible {
-            display: block !important;
-            opacity: 1 !important;
-            transform: translate(-50%, -50%) scale(1) !important;
-            pointer-events: auto !important;
-            z-index: 100;
-        }
-
-        .loader-fade-out {
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-
-        /* Feature Item Styling */
-        .feature-item {
+            height: 100vh;
+            width: 100vw;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 12px;
-            background: #0d0d0d;
-            border: 1px solid transparent;
-            color: #888;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            margin-bottom: 4px;
-        }
-
-        .feature-item:hover {
-            background: #141414;
-            color: #fff;
-            border-color: #333;
-        }
-
-        .feature-item.active {
-            background: #1a0a24;
-            border-color: #a020f0 !important;
-            color: #fff;
-            box-shadow: 0 0 15px rgba(160, 32, 240, 0.15);
-        }
-
-        .feature-item.active .keybind-box {
-            border-color: #a020f0;
-            color: #a020f0;
-            box-shadow: 0 0 8px rgba(160, 32, 240, 0.3);
-        }
-
-        /* Keybind Box */
-        .keybind-box {
-            width: auto;
-            min-width: 45px;
-            height: 18px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 2px;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 9px;
-            color: #555;
-            transition: all 0.2s ease;
-        }
-
-        .keybind-box:hover {
-            border-color: #a020f0;
+            align-items: center;
             color: #fff;
+            user-select: none;
         }
 
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 2px;
+        #wrapper {
+            width: 800px;
+            height: 500px;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            display: none; /* Controlled by Lua */
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #0f0f0f;
+        .header {
+            padding: 20px 30px;
+            background: #111;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #333;
+        .header h1 { font-size: 20px; font-weight: 800; letter-spacing: 1px; color: #fff; }
+        .header .status { font-size: 11px; color: #4CAF50; text-transform: uppercase; }
+
+        .main {
+            flex: 1;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            overflow-y: auto;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #a020f0;
+        .feature-card {
+            background: #161616;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #222;
+            transition: all 0.2s;
         }
 
-        /* Glow Pulser */
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 20px rgba(160, 32, 240, 0.1); }
-            50% { box-shadow: 0 0 30px rgba(160, 32, 240, 0.2); }
-            100% { box-shadow: 0 0 20px rgba(160, 32, 240, 0.1); }
+        .feature-card:hover { border-color: #444; background: #1a1a1a; }
+
+        .feature-title { font-size: 13px; font-weight: 600; color: #aaa; margin-bottom: 12px; }
+
+        /* Modern Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
         }
 
-        #main-menu {
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px; width: 14px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: #4CAF50; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .button {
+            width: 100%;
+            padding: 10px;
+            background: #222;
             border: 1px solid #333;
-            border-radius: 2px;
-            animation: pulse-glow 3s infinite ease-in-out;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .button:hover { background: #333; border-color: #444; }
+
+        .button-group { display: flex; gap: 8px; margin-top: 10px; }
+
+        .slider-input { width: 100%; margin-top: 10px; accent-color: #4CAF50; cursor: pointer; }
+
+        .footer {
+            padding: 10px 30px;
+            background: #0d0d0d;
+            border-top: 1px solid #222;
+            font-size: 10px;
+            color: #444;
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
-<body class="bg-transparent overflow-hidden">
-    <!-- Loader -->
-    <div id="loader-container" class="fixed inset-0 flex items-center justify-center bg-[#0f0f0f]/[0.98] transition-opacity duration-1000 z-50">
-        <div class="text-center">
-            <div class="loader-circle border-4 border-t-[#a020f0] border-[#333] rounded-full w-12 h-12 animate-spin-slow mx-auto mb-4"></div>
-            <p class="text-white text-sm font-light tracking-widest uppercase">Carregando Assets</p>
-            <div class="w-48 h-1 bg-[#333] mt-4 rounded-full overflow-hidden">
-                <div id="progress-bar" class="w-0 h-full bg-[#a020f0] transition-all duration-3000 ease-in-out"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Menu -->
-    <div id="main-menu" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] bg-[#0f0f0f]/[0.98] border border-[#333] menu-hidden opacity-0 scale-95 transition-all duration-500">
-        <div class="p-4 border-b border-[#333] flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="bg-[#a020f0] text-black font-bold px-2 py-0.5 rounded text-xs shadow-[0_0_10px_rgba(160,32,240,0.5)]">ZT</div>
-                <h1 class="text-white font-['Montserrat'] font-bold text-sm tracking-tight">ZERO TRACE MENU</h1>
-            </div>
-            <span class="text-[#666] text-[10px] font-bold">V1.0.0</span>
-        </div>
-
-        <div class="p-4 bg-[#141414] mx-4 my-3 border border-[#333] flex items-center gap-4">
-            <div class="relative">
-                <div class="w-10 h-10 rounded-full border border-[#a020f0] flex items-center justify-center bg-[#0a0a0a] overflow-hidden">
-                    <img src="https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg" alt="Avatar" class="w-full h-full object-cover grayscale opacity-80">
-                </div>
-                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#141414]"></div>
-            </div>
+<body>
+    <div id="wrapper">
+        <div class="header">
             <div>
-                <p class="text-xs text-[#888] font-semibold uppercase tracking-wider">User Profile</p>
-                <p class="text-white font-bold text-sm">Luis_Xitada</p>
+                <h1>ARCHITECT</h1>
+                <p style="font-size: 10px; color: #555;">SYSTEM LOADED</p>
+            </div>
+            <span class="status">● Active</span>
+        </div>
+
+        <div class="main">
+            <!-- Self Options -->
+            <div class="feature-card">
+                <div class="feature-title">Self Utilities</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span>Godmode</span>
+                    <label class="switch">
+                        <input type="checkbox" onchange="toggleFeature('godmode', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Ghost</span>
+                    <label class="switch">
+                        <input type="checkbox" onchange="toggleFeature('ghostmode', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <button class="button" style="margin-top: 15px;" onclick="clickButton('revive')">Revive / Heal</button>
+            </div>
+
+            <!-- Weapon Options -->
+            <div class="feature-card">
+                <div class="feature-title">Weaponry</div>
+                <button class="button" onclick="clickButton('give_weapons')">Give Combat Kit</button>
+                <div style="margin-top: 15px;">
+                    <span style="font-size: 11px; color: #666;">Fire Rate Factor</span>
+                    <input type="range" class="slider-input" min="1" max="10" value="1" oninput="sliderChange('fire_rate', this.value)">
+                </div>
+            </div>
+
+            <!-- World/Other -->
+            <div class="feature-card">
+                <div class="feature-title">Movement</div>
+                <div style="margin-top: 5px;">
+                    <span style="font-size: 11px; color: #666;">Speed Factor</span>
+                    <input type="range" class="slider-input" min="1" max="50" value="10" oninput="sliderChange('speed', this.value)">
+                </div>
+                <button class="button" style="margin-top: 15px; background: #822;" onclick="clickButton('close_menu')">Unload System</button>
             </div>
         </div>
 
-        <div class="px-4 py-2 space-y-1 max-h-[400px] overflow-y-auto custom-scrollbar">
-            <div class="feature-item active" data-feature="godmode">
-                <span>God Mode</span>
-                <div class="keybind-box" onclick="startKeybind(event, 'godmode')">None</div>
-            </div>
-            <div class="feature-item" data-feature="invisible">
-                <span>Invisibility</span>
-                <div class="keybind-box" onclick="startKeybind(event, 'invisible')">None</div>
-            </div>
-            <div class="feature-item" data-feature="infiniteammo">
-                <span>Infinite Ammo</span>
-                <div class="keybind-box" onclick="startKeybind(event, 'infiniteammo')">None</div>
-            </div>
-            <div class="feature-item" data-feature="noclip">
-                <span>No Clip</span>
-                <div class="keybind-box" onclick="startKeybind(event, 'noclip')">None</div>
-            </div>
-            <div class="feature-item" data-feature="esp">
-                <span>ESP Box</span>
-                <div class="keybind-box" onclick="startKeybind(event, 'esp')">None</div>
-            </div>
-        </div>
-
-        <div class="p-4 border-t border-[#333] flex items-center justify-between text-[11px] font-bold">
-            <div class="flex items-center gap-2 text-[#888] hover:text-white cursor-pointer transition-colors">
-                <i class="fab fa-discord"></i>
-                <span>discord.gg/zt</span>
-            </div>
-            <div class="text-[#888]">
-                <span class="text-[#a020f0]">1</span> / 8
-            </div>
-        </div>
-
-        <div id="key-listener-overlay" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center text-white text-xs uppercase tracking-widest font-bold">
-            Awaiting Next Keypress...
+        <div class="footer">
+            <span>Architect External v1.0.4</span>
+            <span>Local Build: 2026.04.05</span>
         </div>
     </div>
 
     <script>
-        let currentFeature = null;
-        let isListeningForKey = false;
-        let selectedIndex = 0;
-        const features = document.querySelectorAll('.feature-item');
-
-        window.addEventListener('load', () => {
-            const progressBar = document.getElementById('progress-bar');
-            if (progressBar) {
-                progressBar.style.width = '100%';
-            }
-
-            setTimeout(() => {
-                const loader = document.getElementById('loader-container');
-                const menu = document.getElementById('main-menu');
-                
-                loader.classList.add('loader-fade-out');
-                
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    menu.classList.remove('menu-hidden');
-                    menu.classList.add('menu-visible');
-                    updateSelection();
-                }, 1000);
-            }, 3000);
-        });
-
-        function updateSelection() {
-            features.forEach((item, index) => {
-                item.classList.remove('active');
-                if (index === selectedIndex) {
-                    item.classList.add('active');
-                    const counterLabel = document.querySelector('.text-[#888] .text-[#a020f0]');
-                    if (counterLabel) {
-                        counterLabel.innerText = selectedIndex + 1;
-                    }
-                }
-            });
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (isListeningForKey) {
-                handleKeyCapture(e);
-                return;
-            }
-
-            if (e.key === 'ArrowDown') {
-                selectedIndex = (selectedIndex + 1) % features.length;
-                updateSelection();
-            } else if (e.key === 'ArrowUp') {
-                selectedIndex = (selectedIndex - 1 + features.length) % features.length;
-                updateSelection();
-            } else if (e.key === 'Enter') {
-                toggleFeature(features[selectedIndex].dataset.feature);
-            }
-        });
-
-        function toggleFeature(featureName) {
-            fetch(`https://zt_menu/toggleFeature`, {
-                method: 'POST',
-                body: JSON.stringify({ name: featureName })
-            });
-        }
-
-        function startKeybind(event, featureName) {
-            if (event) event.stopPropagation();
-            currentFeature = featureName;
-            isListeningForKey = true;
-            
-            const overlay = document.getElementById('key-listener-overlay');
-            overlay.classList.remove('hidden');
-        }
-
-        function handleKeyCapture(e) {
-            e.preventDefault();
-            const key = e.key.toUpperCase();
-            
-            const featureElement = document.querySelector(`[data-feature="${currentFeature}"] .keybind-box`);
-            if (featureElement) {
-                featureElement.innerText = key;
-            }
-
-            fetch(`https://zt_menu/setKeybind`, {
-                method: 'POST',
-                body: JSON.stringify({ 
-                    feature: currentFeature, 
-                    key: key 
-                })
-            });
-
-            isListeningForKey = false;
-            document.getElementById('key-listener-overlay').classList.add('hidden');
-        }
-
+        // Handle Lua Messages
         window.addEventListener('message', (event) => {
             const data = event.data;
-            if (data.type === 'setVisible') {
-                const menu = document.getElementById('main-menu');
-                if (data.show) {
-                    menu.classList.remove('menu-hidden');
-                    menu.classList.add('menu-visible');
-                } else {
-                    menu.classList.remove('menu-visible');
-                    menu.classList.add('menu-hidden');
-                }
+            if (data.type === "toggle_ui") {
+                document.getElementById('wrapper').style.display = data.visible ? 'flex' : 'none';
             }
         });
+
+        // Communication back to Lua
+        function post(url, data) {
+            fetch(`https://architect/${url}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).catch(e => console.log('Lua post error:', e));
+        }
+
+        function toggleFeature(name, state) { post('toggle_feature', { name, state }); }
+        function clickButton(name) { post('button_click', { name }); }
+        function sliderChange(name, value) { post('slider_change', { name, value }); }
     </script>
 </body>
 </html>
