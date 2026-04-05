@@ -21,10 +21,17 @@
         .subtab-active { color: #60a5fa; border-bottom: 2px solid #2563eb; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #2563eb; border-radius: 10px; }
+        .close-btn:hover { color: #ef4444; transform: scale(1.1); }
     </style>
 </head>
 <body class="flex items-center justify-center h-screen">
-    <div id="app" class="cold-window w-[950px] h-[600px] rounded-xl flex overflow-hidden hidden">
+    <div id="app" class="cold-window w-[950px] h-[600px] rounded-xl flex overflow-hidden hidden relative">
+        
+        <!-- Close Button (Top Right) -->
+        <button onclick="closeMenu()" class="absolute top-4 right-6 text-gray-500 close-btn transition-all z-50">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+
         <!-- Sidebar -->
         <div class="sidebar w-52 flex flex-col">
             <div class="p-6 flex items-center gap-3">
@@ -60,7 +67,7 @@
                     <button class="text-[11px] font-bold uppercase tracking-widest h-full text-gray-500 hover:text-gray-300">Subtab 2</button>
                     <button class="text-[11px] font-bold uppercase tracking-widest h-full text-gray-500 hover:text-gray-300">Subtab 3</button>
                 </div>
-                <div class="bg-white/5 rounded-lg px-4 py-2 flex items-center gap-3 border border-white/10">
+                <div class="bg-white/5 rounded-lg px-4 py-2 flex items-center gap-3 border border-white/10 mr-12">
                     <i data-lucide="search" class="w-4 h-4 text-gray-500"></i>
                     <input type="text" placeholder="PESQUISAR..." class="bg-transparent border-none outline-none text-[10px] font-bold text-gray-300 placeholder-gray-600 w-32">
                 </div>
@@ -89,9 +96,6 @@
                             </div>
                             <input type="range" class="slider" oninput="updateSlider(this, 'speed')">
                         </div>
-                        <button class="w-full bg-blue-600/10 border border-blue-500/30 py-3 rounded-lg text-[10px] font-black text-blue-400 uppercase tracking-widest hover:bg-blue-600/20 transition" onclick="triggerAction('revive')">
-                            Reviver Jogador
-                        </button>
                     </div>
                 </div>
 
@@ -122,6 +126,13 @@
     <script>
         lucide.createIcons();
 
+        function closeMenu() {
+            fetch(`https://${GetParentResourceName()}/close_menu`, {
+                method: 'POST',
+                body: JSON.stringify({})
+            });
+        }
+
         function toggleSwitch(el, name) {
             el.classList.toggle('switch-active');
             const isActive = el.classList.contains('switch-active');
@@ -136,20 +147,6 @@
             fetch(`https://${GetParentResourceName()}/slider_change`, {
                 method: 'POST',
                 body: JSON.stringify({ name: name, value: el.value })
-            });
-        }
-
-        function triggerAction(name) {
-            fetch(`https://${GetParentResourceName()}/button_click`, {
-                method: 'POST',
-                body: JSON.stringify({ name: name })
-            });
-        }
-
-        function triggerCombo(name, val) {
-            fetch(`https://${GetParentResourceName()}/combo_change`, {
-                method: 'POST',
-                body: JSON.stringify({ name: name, value: val })
             });
         }
 
