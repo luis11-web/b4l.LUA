@@ -2,85 +2,160 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Architect Menu</title>
+    <title>Cold Menu</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        body { background: transparent; color: #d1d5db; font-family: 'Inter', sans-serif; overflow: hidden; }
-        .architect-window { background: #1a1a1a; border: 1px solid #007bff; box-shadow: 0 0 40px rgba(0,0,0,0.9); }
-        .sidebar { background: #111111; }
-        .active-tab { border-left: 2px solid #007bff; color: white; background: rgba(0,123,255,0.05); }
-        .toggle-box { width: 16px; height: 16px; border: 1px solid #374151; transition: all 0.2s; }
-        .toggle-active { background: #007bff; border-color: #007bff; box-shadow: 0 0 10px rgba(0,123,255,0.4); }
-        .bind-box { background: #111111; border: 1px solid #374151; font-size: 9px; min-width: 45px; text-align: center; }
-        .binding-active { border-color: #007bff; color: #007bff; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        body { background: transparent; color: #d1d5db; font-family: 'Inter', sans-serif; overflow: hidden; user-select: none; }
+        .cold-window { background: #0a0a0a; border: 1px solid rgba(37, 99, 235, 0.3); box-shadow: 0 0 50px rgba(0,0,0,0.9); }
+        .sidebar { background: #111111; border-right: 1px solid rgba(255,255,255,0.05); }
+        .active-tab { background: rgba(37, 99, 235, 0.1); color: #60a5fa; border-left: 2px solid #2563eb; }
+        .card { background: #111111; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; }
+        .switch { width: 32px; height: 16px; background: #374151; border-radius: 999px; position: relative; cursor: pointer; transition: 0.3s; }
+        .switch-active { background: #2563eb; }
+        .switch-circle { width: 10px; height: 10px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: 0.3s; }
+        .switch-active .switch-circle { left: 19px; }
+        .slider { -webkit-appearance: none; width: 100%; height: 4px; background: #374151; border-radius: 5px; outline: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #2563eb; border-radius: 50%; cursor: pointer; border: 2px solid white; }
+        .subtab-active { color: #60a5fa; border-bottom: 2px solid #2563eb; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #2563eb; border-radius: 10px; }
     </style>
 </head>
 <body class="flex items-center justify-center h-screen">
-    <div id="app" class="architect-window w-[850px] h-[550px] rounded-sm flex overflow-hidden hidden">
+    <div id="app" class="cold-window w-[950px] h-[600px] rounded-xl flex overflow-hidden hidden">
         <!-- Sidebar -->
-        <div class="sidebar w-[220px] flex flex-col">
-            <div class="p-6 mb-4">
-                <h1 class="text-[10px] font-black tracking-[0.4em] text-white opacity-90">ARCHITECT</h1>
-                <div class="h-[1px] w-full bg-blue-600/30 mt-2"></div>
+        <div class="sidebar w-52 flex flex-col">
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.5)]">
+                    <span class="text-white font-black text-sm italic">C</span>
+                </div>
+                <span class="text-white font-black tracking-tighter text-xl italic">COLD</span>
             </div>
-            <nav class="flex-1">
-                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold active-tab uppercase tracking-wider">Player</button>
-                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold text-gray-500 hover:text-gray-300 uppercase tracking-wider transition">Weapon</button>
-                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold text-gray-500 hover:text-gray-300 uppercase tracking-wider transition">Vehicle</button>
-                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold text-gray-500 hover:text-gray-300 uppercase tracking-wider transition">Visuals</button>
-                <button class="w-full text-left px-6 py-3 text-[11px] font-semibold text-gray-500 hover:text-gray-300 uppercase tracking-wider transition">Config</button>
+            <nav class="flex-1 px-3 space-y-1 mt-4">
+                <div class="px-4 py-2 text-[10px] font-black text-gray-600 uppercase tracking-widest">Geral</div>
+                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[11px] font-bold uppercase tracking-wider active-tab">
+                    <i data-lucide="user" class="w-4 h-4"></i> Jogador
+                </button>
+                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[11px] font-bold uppercase tracking-wider text-gray-500 hover:bg-white/5 transition">
+                    <i data-lucide="car" class="w-4 h-4"></i> Veículos
+                </button>
+                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[11px] font-bold uppercase tracking-wider text-gray-500 hover:bg-white/5 transition">
+                    <i data-lucide="crosshair" class="w-4 h-4"></i> Armas
+                </button>
+                <div class="px-4 py-2 mt-4 text-[10px] font-black text-gray-600 uppercase tracking-widest">Servidor</div>
+                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[11px] font-bold uppercase tracking-wider text-gray-500 hover:bg-white/5 transition">
+                    <i data-lucide="globe" class="w-4 h-4"></i> Online
+                </button>
             </nav>
         </div>
 
         <!-- Main Body -->
-        <div class="flex-1 p-8 overflow-y-auto">
-            <div class="grid grid-cols-2 gap-4">
-                <!-- Feature Item -->
-                <div class="bg-[#111111]/40 border border-white/5 p-4 rounded-sm flex justify-between items-center group hover:bg-white/5 transition">
-                    <div class="flex items-center gap-3">
-                        <div id="godmode-toggle" class="toggle-box rounded-sm" onclick="toggleFeature('godmode')"></div>
-                        <span class="text-[11px] font-bold text-gray-200 uppercase tracking-wide">Godmode</span>
-                    </div>
-                    <div id="godmode-bind" class="bind-box py-1 px-2 rounded-sm cursor-pointer text-gray-500" onclick="startBinding('godmode')">[NONE]</div>
+        <div class="flex-1 flex flex-col">
+            <!-- Top Bar -->
+            <div class="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#111111]/50">
+                <div class="flex gap-6 h-full">
+                    <button class="text-[11px] font-bold uppercase tracking-widest h-full subtab-active">Subtab 1</button>
+                    <button class="text-[11px] font-bold uppercase tracking-widest h-full text-gray-500 hover:text-gray-300">Subtab 2</button>
+                    <button class="text-[11px] font-bold uppercase tracking-widest h-full text-gray-500 hover:text-gray-300">Subtab 3</button>
                 </div>
-                
-                <!-- More items... -->
+                <div class="bg-white/5 rounded-lg px-4 py-2 flex items-center gap-3 border border-white/10">
+                    <i data-lucide="search" class="w-4 h-4 text-gray-500"></i>
+                    <input type="text" placeholder="PESQUISAR..." class="bg-transparent border-none outline-none text-[10px] font-bold text-gray-300 placeholder-gray-600 w-32">
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="flex-1 p-8 grid grid-cols-2 gap-6 overflow-y-auto">
+                <!-- Card 1 -->
+                <div class="card p-6 space-y-4">
+                    <div class="flex items-center gap-3 text-[11px] font-black text-blue-500 uppercase tracking-[0.2em] mb-2">
+                        <i data-lucide="settings" class="w-4 h-4"></i> Opções Gerais
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Godmode</span>
+                            <div class="switch" onclick="toggleSwitch(this, 'godmode')"><div class="switch-circle"></div></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Invisível</span>
+                            <div class="switch" onclick="toggleSwitch(this, 'invisible')"><div class="switch-circle"></div></div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[10px] font-bold text-gray-500 uppercase">
+                                <span>Velocidade</span>
+                                <span id="speed-val">50</span>
+                            </div>
+                            <input type="range" class="slider" oninput="updateSlider(this, 'speed')">
+                        </div>
+                        <button class="w-full bg-blue-600/10 border border-blue-500/30 py-3 rounded-lg text-[10px] font-black text-blue-400 uppercase tracking-widest hover:bg-blue-600/20 transition" onclick="triggerAction('revive')">
+                            Reviver Jogador
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card p-6 space-y-4">
+                    <div class="flex items-center gap-3 text-[11px] font-black text-blue-500 uppercase tracking-[0.2em] mb-2">
+                        <i data-lucide="zap" class="w-4 h-4"></i> Movimentação
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Noclip</span>
+                            <div class="switch" onclick="toggleSwitch(this, 'noclip')"><div class="switch-circle"></div></div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="text-[10px] font-bold text-gray-500 uppercase">Exemplo Combo:</div>
+                            <select class="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-[11px] text-gray-300 outline-none" onchange="triggerCombo('menu_type', this.value)">
+                                <option>Opção 1</option>
+                                <option>Opção 2</option>
+                                <option>Opção 3</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        let features = { godmode: { active: false, bind: 'NONE' } };
+        lucide.createIcons();
 
-        function toggleFeature(name) {
-            features[name].active = !features[name].active;
-            document.getElementById(`${name}-toggle`).className = `toggle-box rounded-sm ${features[name].active ? 'toggle-active' : ''}`;
+        function toggleSwitch(el, name) {
+            el.classList.toggle('switch-active');
+            const isActive = el.classList.contains('switch-active');
             fetch(`https://${GetParentResourceName()}/toggle_feature`, {
                 method: 'POST',
-                body: JSON.stringify({ name: name, state: features[name].active })
+                body: JSON.stringify({ name: name, state: isActive })
             });
         }
 
-        function startBinding(name) {
-            const el = document.getElementById(`${name}-bind`);
-            el.innerText = 'BINDING...';
-            el.classList.add('binding-active');
-            fetch(`https://${GetParentResourceName()}/start_binding`, {
+        function updateSlider(el, name) {
+            document.getElementById(`${name}-val`).innerText = el.value;
+            fetch(`https://${GetParentResourceName()}/slider_change`, {
                 method: 'POST',
-                body: JSON.stringify({ feature: name })
+                body: JSON.stringify({ name: name, value: el.value })
+            });
+        }
+
+        function triggerAction(name) {
+            fetch(`https://${GetParentResourceName()}/button_click`, {
+                method: 'POST',
+                body: JSON.stringify({ name: name })
+            });
+        }
+
+        function triggerCombo(name, val) {
+            fetch(`https://${GetParentResourceName()}/combo_change`, {
+                method: 'POST',
+                body: JSON.stringify({ name: name, value: val })
             });
         }
 
         window.addEventListener('message', (event) => {
-            const data = event.data;
-            if (data.type === 'toggle_ui') {
-                document.getElementById('app').style.display = data.visible ? 'flex' : 'none';
-            } else if (data.type === 'key_captured') {
-                const el = document.getElementById(`${data.feature}-bind`);
-                el.innerText = `[KEY ${data.key}]`;
-                el.classList.remove('binding-active');
+            if (event.data.type === 'toggle_ui') {
+                document.getElementById('app').style.display = event.data.visible ? 'flex' : 'none';
             }
         });
     </script>
