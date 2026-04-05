@@ -71,7 +71,7 @@ end
 
 Menu.Banner = {
     enabled = true,
-    imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&=",
+    imageUrl = "https://i.imgur.com/pxHCIGe",
     height = 100
 }
 
@@ -143,27 +143,27 @@ function Menu.ApplyTheme(themeName)
     if themeLower == "red" then
         Menu.Colors.HeaderPink = { r = 255, g = 0, b = 0 }
         Menu.Colors.SelectedBg = { r = 255, g = 0, b = 0 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
+        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
         Menu.CurrentTheme = "Red"
     elseif themeLower == "purple" then
         Menu.Colors.HeaderPink = { r = 148, g = 0, b = 211 }
         Menu.Colors.SelectedBg = { r = 148, g = 0, b = 211 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
+        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
         Menu.CurrentTheme = "Purple"
     elseif themeLower == "gray" then
         Menu.Colors.HeaderPink = { r = 128, g = 128, b = 128 }
         Menu.Colors.SelectedBg = { r = 128, g = 128, b = 128 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
+        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
         Menu.CurrentTheme = "Gray"
     elseif themeLower == "pink" then
         Menu.Colors.HeaderPink = { r = 255, g = 20, b = 147 }
         Menu.Colors.SelectedBg = { r = 255, g = 20, b = 147 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
+        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
         Menu.CurrentTheme = "pink"
     else
         Menu.Colors.HeaderPink = { r = 148, g = 0, b = 211 }
         Menu.Colors.SelectedBg = { r = 148, g = 0, b = 211 }
-        Menu.Banner.imageUrl = "https://media.discordapp.net/attachments/1482680643694366871/1486462431399120916/b4l_intro.gif?ex=69d36f44&is=69d21dc4&hm=aa49f6f0990170d33d4a7607ef9c84d1fd61c76c8c03191fb62a67ae9db1254c&="
+        Menu.Banner.imageUrl = "https://i.imgur.com/pxHCIGe"
         Menu.CurrentTheme = "Purple"
     end
 
